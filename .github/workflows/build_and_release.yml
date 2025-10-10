@@ -49,7 +49,10 @@ jobs:
           fqbn: arduino:avr:uno
           libraries: |
             DMXSerial
-      - run: ls receiver*/*
+      - name: Show files
+        run: |
+          ls receiver*/*
+          ls */*
       - name: Rename RGB output binary
         run: |
           mv receiver_rgb/build/receiver_rgb.ino.hex \
