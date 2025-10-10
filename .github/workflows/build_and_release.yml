@@ -25,7 +25,7 @@ jobs:
           sed -i "s/<#DMXADDRESS#>/${{ matrix.dmx_start }}/g" ws281x-dmx-controller/receiver_rgb/receiver_rgb_${{ matrix.dmx_start }}.ino
 
       - name: Compile RGB sketch for DMX start ${{ matrix.dmx_start }}
-        uses: arduino/compile-sketches@v1.3.0
+        uses: arduino/compile-sketches@v1.1.2
         with:
           sketch-path: ws281x-dmx-controller/receiver_rgb
           fqbn: arduino:avr:uno
@@ -52,7 +52,7 @@ jobs:
           sed -i "s/<#DMXADDRESS#>/${{ matrix.dmx_start }}/g" ws281x-dmx-controller/receiver_rgbw/receiver_rgbw_${{ matrix.dmx_start }}.ino
 
       - name: Compile RGBW sketch for DMX start ${{ matrix.dmx_start }}
-        uses: arduino/compile-sketches@v1.3.0
+        uses: arduino/compile-sketches@v1.1.2
         with:
           sketch-path: ws281x-dmx-controller/receiver_rgbw
           fqbn: arduino:avr:uno
