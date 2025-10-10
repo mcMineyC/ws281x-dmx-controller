@@ -17,6 +17,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install Arduino CLI
+        uses: arduino/setup-arduino-cli@v2
+      - run: arduino-cli lib install DMXSerial
+
       # Build RGB version
       - name: Prepare RGB sketch
         run: |
@@ -24,14 +28,17 @@ jobs:
           sed -i "s/<#NUMPIXELS#>/${{ github.event.inputs.led_count }}/g" receiver_rgb/receiver_rgb.ino
           sed -i "s/<#DMXADDRESS#>/${{ matrix.dmx_start }}/g" receiver_rgb/receiver_rgb.ino
 
-      - name: Compile RGB sketch
-        uses: arduino/compile-sketches@v1.1.2
-        with:
-          sketch-paths: |
-            - receiver_rgb
-          fqbn: arduino:avr:uno
-          libraries: |
-            DMXSerial
+      # - name: Compile RGB sketch
+      #   uses: arduino/compile-sketches@v1.1.2
+      #   with:
+      #     sketch-paths: |
+      #       - receiver_rgb
+      #     fqbn: arduino:avr:uno
+      #     libraries: |
+      #       DMXSerial
+      - name: Compile receiver_rgb
+        run: |
+          arduino-cli compile --fqbn arduino:avr:uno receiver_rgb --output-dir receiver_rgb/build
       - run: ls */*
       - name: Rename RGB output binary
         run: |
@@ -50,14 +57,17 @@ jobs:
           sed -i "s/<#NUMPIXELS#>/${{ github.event.inputs.led_count }}/g" receiver_rgbw/receiver_rgbw.ino
           sed -i "s/<#DMXADDRESS#>/${{ matrix.dmx_start }}/g" receiver_rgbw/receiver_rgbw.ino
 
-      - name: Compile RGBW sketch
-        uses: arduino/compile-sketches@v1.1.2
-        with:
-          sketch-paths: |
-            - receiver_rgbw
-          fqbn: arduino:avr:uno
-          libraries: |
-            DMXSerial
+      # - name: Compile RGBW sketch
+      #   uses: arduino/compile-sketches@v1.1.2
+      #   with:
+      #     sketch-paths: |
+      #       - receiver_rgbw
+      #     fqbn: arduino:avr:uno
+      #     libraries: |
+      #       DMXSerial
+      - name: Compile receiver_rgbw
+        run: |
+          arduino-cli compile --fqbn arduino:avr:uno receiver_rgbw --output-dir receiver_rgbw/build
 
       - name: Rename RGBW output binary
         run: |
