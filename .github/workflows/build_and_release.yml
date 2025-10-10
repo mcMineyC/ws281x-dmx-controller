@@ -20,14 +20,14 @@ jobs:
       # Build RGB version
       - name: Prepare RGB sketch for DMX start ${{ matrix.dmx_start }}
         run: |
-          cp ws281x-dmx-controller/receiver_rgb/receiver_rgb.ino ws281x-dmx-controller/receiver_rgb/receiver_rgb_${{ matrix.dmx_start }}.ino
-          sed -i "s/<#NUMPIXELS#>/${{ github.event.inputs.led_count }}/g" ws281x-dmx-controller/receiver_rgb/receiver_rgb_${{ matrix.dmx_start }}.ino
-          sed -i "s/<#DMXADDRESS#>/${{ matrix.dmx_start }}/g" ws281x-dmx-controller/receiver_rgb/receiver_rgb_${{ matrix.dmx_start }}.ino
+          cp receiver_rgb/receiver_rgb.ino receiver_rgb/receiver_rgb_${{ matrix.dmx_start }}.ino
+          sed -i "s/<#NUMPIXELS#>/${{ github.event.inputs.led_count }}/g" receiver_rgb/receiver_rgb_${{ matrix.dmx_start }}.ino
+          sed -i "s/<#DMXADDRESS#>/${{ matrix.dmx_start }}/g" receiver_rgb/receiver_rgb_${{ matrix.dmx_start }}.ino
 
       - name: Compile RGB sketch for DMX start ${{ matrix.dmx_start }}
         uses: arduino/compile-sketches@v1.1.2
         with:
-          sketch-path: ws281x-dmx-controller/receiver_rgb
+          sketch-path: receiver_rgb
           fqbn: arduino:avr:uno
           libraries: |
             DMXSerial
@@ -36,25 +36,25 @@ jobs:
 
       - name: Rename RGB output binary
         run: |
-          mv ws281x-dmx-controller/receiver_rgb/build/receiver_rgb_${{ matrix.dmx_start }}.ino.hex \
-             ws281x-dmx-controller/receiver_rgb/build/receiver_rgb_${{ matrix.dmx_start }}_${{ github.event.inputs.led_count }}leds.hex
+          mv receiver_rgb/build/receiver_rgb_${{ matrix.dmx_start }}.ino.hex \
+             receiver_rgb/build/receiver_rgb_${{ matrix.dmx_start }}_${{ github.event.inputs.led_count }}leds.hex
       - name: Upload RGB build artifact for DMX start ${{ matrix.dmx_start }}
         uses: actions/upload-artifact@v4
         with:
           name: receiver_rgb_${{ matrix.dmx_start }}_${{ github.event.inputs.led_count }}
-          path: ws281x-dmx-controller/receiver_rgb/build/receiver_rgb_${{ matrix.dmx_start }}_${{ github.event.inputs.led_count }}.hex
+          path: receiver_rgb/build/receiver_rgb_${{ matrix.dmx_start }}_${{ github.event.inputs.led_count }}.hex
 
       # Build RGBW version
       - name: Prepare RGBW sketch for DMX start ${{ matrix.dmx_start }}
         run: |
-          cp ws281x-dmx-controller/receiver_rgbw/receiver_rgbw.ino ws281x-dmx-controller/receiver_rgbw/receiver_rgbw_${{ matrix.dmx_start }}.ino
-          sed -i "s/<#NUMPIXELS#>/${{ github.event.inputs.led_count }}/g" ws281x-dmx-controller/receiver_rgbw/receiver_rgbw_${{ matrix.dmx_start }}.ino
-          sed -i "s/<#DMXADDRESS#>/${{ matrix.dmx_start }}/g" ws281x-dmx-controller/receiver_rgbw/receiver_rgbw_${{ matrix.dmx_start }}.ino
+          cp receiver_rgbw/receiver_rgbw.ino receiver_rgbw/receiver_rgbw_${{ matrix.dmx_start }}.ino
+          sed -i "s/<#NUMPIXELS#>/${{ github.event.inputs.led_count }}/g" receiver_rgbw/receiver_rgbw_${{ matrix.dmx_start }}.ino
+          sed -i "s/<#DMXADDRESS#>/${{ matrix.dmx_start }}/g" receiver_rgbw/receiver_rgbw_${{ matrix.dmx_start }}.ino
 
       - name: Compile RGBW sketch for DMX start ${{ matrix.dmx_start }}
         uses: arduino/compile-sketches@v1.1.2
         with:
-          sketch-path: ws281x-dmx-controller/receiver_rgbw
+          sketch-path: receiver_rgbw
           fqbn: arduino:avr:uno
           libraries: |
             DMXSerial
@@ -63,13 +63,13 @@ jobs:
 
       - name: Rename RGBW output binary
         run: |
-          mv ws281x-dmx-controller/receiver_rgbw/build/receiver_rgbw_${{ matrix.dmx_start }}.ino.hex \
-             ws281x-dmx-controller/receiver_rgbw/build/receiver_rgbw_${{ matrix.dmx_start }}_${{ github.event.inputs.led_count }}leds.hex
+          mv receiver_rgbw/build/receiver_rgbw_${{ matrix.dmx_start }}.ino.hex \
+             receiver_rgbw/build/receiver_rgbw_${{ matrix.dmx_start }}_${{ github.event.inputs.led_count }}leds.hex
       - name: Upload RGBW build artifact for DMX start ${{ matrix.dmx_start }}
         uses: actions/upload-artifact@v4
         with:
           name: receiver_rgbw_${{ matrix.dmx_start }}_${{ github.event.inputs.led_count }}
-          path: ws281x-dmx-controller/receiver_rgbw/build/receiver_rgbw_${{ matrix.dmx_start }}_${{ github.event.inputs.led_count }}.hex
+          path: receiver_rgbw/build/receiver_rgbw_${{ matrix.dmx_start }}_${{ github.event.inputs.led_count }}.hex
 
   release:
     runs-on: ubuntu-latest
