@@ -8,3 +8,4 @@ It's based on the wonderful work of (GadgetReboot)[https://github.com/GadgetRebo
 While you could download the code and compile, you could also download the firmware from the releases.  I wouldn't recommend that either, since the releases has **1,005** files in it.  Just use this simple flasher :wink:
 
 (Flasher Link)[https://ws281x-dmx-flasher.vercel.app/]
+*Note*: Currently only 128 LED builds are available.  I have no need for any other right now, so open an issue if you would like to see other build supported.
