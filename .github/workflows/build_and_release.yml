@@ -88,15 +88,10 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Download all RGB build artifacts
+      - name: Download all build artifacts
         uses: actions/download-artifact@v4
         with:
-          path: rgb_builds
-
-      - name: Download all RGBW build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: rgbw_builds
+          path: builds
       - run: ls *
       - name: Create Release
         uses: softprops/action-gh-release@v2
@@ -105,5 +100,4 @@ jobs:
           name: "${{ github.event.inputs.led_count }} LEDs"
           body: "# Arduino Uno only!!!\nDownload the file you need and flash with any AVR programmer.\nName format: receiver_rgb(w)_(dmx start address)_(num leds)leds.hex"
           files: |
-            rgb_builds/receiver_rgb_*_${{ github.event.inputs.led_count }}leds.hex
-            rgbw_builds/receiver_rgbw_*_${{ github.event.inputs.led_count }}leds.hex
+            builds/receiver_rgb*_*_${{ github.event.inputs.led_count }}leds.hex
