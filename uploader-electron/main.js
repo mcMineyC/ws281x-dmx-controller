@@ -47,40 +47,49 @@ app.on("window-all-closed", function () {
 // IPC handlers for firmware download and upload
 let lastFlash = {};
 
-ipcMain.handle("download-firmware", async (event, opts) => {
-  const { dmxstart, pixeltype, numled } = opts;
-  if (
-    lastFlash.dmxstart === dmxstart &&
-    lastFlash.pixeltype === pixeltype &&
-    lastFlash.numled === numled
-  ) {
-    return { success: true, buffer: lastFlash.buffer };
-  }
-  try {
-    const url = `https://github.com/mcMineyC/ws281x-dmx-controller/releases/download/${numled}/receiver_${pixeltype}_${dmxstart}_${numled}leds.hex`;
-    const response = await axios.get(url, {
-      responsetype: "arraybuffer",
-    });
-    lastFlash = {
-      dmxstart,
-      pixeltype,
-      numled,
-      buffer: Buffer.from(response.data),
-    };
-    return { success: true, buffer: lastFlash.buffer };
-  } catch (error) {
-    return { success: false, error: error.toString() };
-  }
-});
+// ipcMain.handle("download-firmware", async (event, opts) => {
+//   const { dmxstart, pixeltype, numled } = opts;
+//   if (
+//     lastFlash.dmxstart === dmxstart &&
+//     lastFlash.pixeltype === pixeltype &&
+//     lastFlash.numled === numled
+//   ) {
+//     return { success: true, buffer: lastFlash.buffer };
+//   }
+//   try {
+//     const url = `https://github.com/mcMineyC/ws281x-dmx-controller/releases/download/${numled}/receiver_${pixeltype}_${dmxstart}_${numled}leds.hex`;
+//     const response = await axios.get(url, {
+//       responsetype: "arraybuffer",
+//     });
+//     lastFlash = {
+//       dmxstart,
+//       pixeltype,
+//       numled,
+//       buffer: Buffer.from(response.data),
+//     };
+//     return { success: true, buffer: lastFlash.buffer };
+//   } catch (error) {
+//     return { success: false, error: error.toString() };
+//   }
+// });
 
 ipcMain.handle("upload-firmware", async (event, opts) => {
-  const { buffer, board = "uno" } = opts;
+  const { dmxstart, pixeltype, numled, board = "uno" } = opts;
   try {
+    // Download firmware
+    const url = `https://github.com/mcMineyC/ws281x-dmx-controller/releases/download/${numled}/receiver_${pixeltype}_${dmxstart}_${numled}leds.hex`;
+    const response = await axios.get(url, {
+      responseType: "arraybuffer",
+    });
+    const buffer = Buffer.from(response.data);
+
+    // Flash firmware using Avrgirl
     let avrgirl = new AvrgirlArduino({
       board,
       debug: true,
       timeout: 1000,
     });
+
     return await new Promise((resolve) => {
       avrgirl.flash(buffer, (error) => {
         if (error) {
