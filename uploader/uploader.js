@@ -2,6 +2,7 @@ var lastFlash = {};
 let avrgirl = new AvrgirlArduino({
   board: "uno",
   debug: true,
+  timeout: 1000,
 });
 async function fetchBinary(dmxstart, pixeltype, numled) {
   if (
