@@ -1,0 +1,20 @@
+{
+  "name": "uploader-electron",
+  "version": "1.0.0",
+  "description": "Electron desktop app for the uploader",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.2.3"
+  },
+  "dependencies": {
+    "avrgirl-arduino": "github:mcmineyc/avrgirl-arduino",
+    "axios": "^1.12.2",
+    "nan": "^2.23.0",
+    "serialport": "^10.3.0"
+  }
+}
