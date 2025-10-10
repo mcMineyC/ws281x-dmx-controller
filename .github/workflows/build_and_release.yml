@@ -20,7 +20,7 @@ jobs:
       # Build RGB version
       - name: Prepare RGB sketch for DMX start ${{ matrix.dmx_start }}
         run: |
-          cp receiver_rgb/receiver_rgb.ino receiver_rgb/receiver_rgb_${{ matrix.dmx_start }}.ino
+          cp receiver_rgb/receiver_rgb.inor receiver_rgb/receiver_rgb_${{ matrix.dmx_start }}.ino
           sed -i "s/<#NUMPIXELS#>/${{ github.event.inputs.led_count }}/g" receiver_rgb/receiver_rgb_${{ matrix.dmx_start }}.ino
           sed -i "s/<#DMXADDRESS#>/${{ matrix.dmx_start }}/g" receiver_rgb/receiver_rgb_${{ matrix.dmx_start }}.ino
 
@@ -48,7 +48,7 @@ jobs:
       # Build RGBW version
       - name: Prepare RGBW sketch for DMX start ${{ matrix.dmx_start }}
         run: |
-          cp receiver_rgbw/receiver_rgbw.ino receiver_rgbw/receiver_rgbw_${{ matrix.dmx_start }}.ino
+          cp receiver_rgbw/receiver_rgbw.inor receiver_rgbw/receiver_rgbw_${{ matrix.dmx_start }}.ino
           sed -i "s/<#NUMPIXELS#>/${{ github.event.inputs.led_count }}/g" receiver_rgbw/receiver_rgbw_${{ matrix.dmx_start }}.ino
           sed -i "s/<#DMXADDRESS#>/${{ matrix.dmx_start }}/g" receiver_rgbw/receiver_rgbw_${{ matrix.dmx_start }}.ino
 
