@@ -24,14 +24,24 @@ jobs:
           sed -i "s/<#NUMPIXELS#>/${{ github.event.inputs.led_count }}/g" receiver_rgb/receiver_rgb.ino
           sed -i "s/<#DMXADDRESS#>/${{ matrix.dmx_start }}/g" receiver_rgb/receiver_rgb.ino
 
-      # - name: Compile RGB sketch
-      #   uses: arduino/compile-sketches@v1.1.2
-      #   with:
-      #     sketch-paths: |
-      #       - receiver_rgb
-      #     fqbn: arduino:avr:uno
-      #     libraries: |
-      #       DMXSerial
+      - name: Compile RGB sketch
+        uses: arduino/compile-sketches@v1.1.2
+        with:
+          sketch-paths: |
+            - receiver_rgb
+          fqbn: arduino:avr:uno
+          libraries: |
+            DMXSerial
+
+      - name: Rename RGB output binary
+        run: |
+          mv receiver_rgb/build/receiver_rgb.ino.hex \
+             receiver_rgb/build/receiver_rgb_${{ matrix.dmx_start }}_${{ github.event.inputs.led_count }}leds.hex
+      - name: Upload RGB build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: receiver_rgb_${{ matrix.dmx_start }}_${{ github.event.inputs.led_count }}
+          path: receiver_rgb/build/receiver_rgb_${{ matrix.dmx_start }}_${{ github.event.inputs.led_count }}.hex
 
       # Build RGBW version
       - name: Prepare RGBW sketch
@@ -40,39 +50,24 @@ jobs:
           sed -i "s/<#NUMPIXELS#>/${{ github.event.inputs.led_count }}/g" receiver_rgbw/receiver_rgbw.ino
           sed -i "s/<#DMXADDRESS#>/${{ matrix.dmx_start }}/g" receiver_rgbw/receiver_rgbw.ino
 
-      - name: Compile sketches
+      - name: Compile RGBW sketch
         uses: arduino/compile-sketches@v1.1.2
         with:
           sketch-paths: |
             - receiver_rgbw
-            - receiver_rgb
           fqbn: arduino:avr:uno
           libraries: |
             DMXSerial
-          output-dir: build
-      - name: Show files
-        run: |
-          ls receiver*/*
-          ls */*
-      - name: Rename RGB output binary
-        run: |
-          mv build/receiver_rgb.ino.hex \
-             build/receiver_rgb_${{ matrix.dmx_start }}_${{ github.event.inputs.led_count }}leds.hex
-      - name: Upload RGB build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: receiver_rgb_${{ matrix.dmx_start }}_${{ github.event.inputs.led_count }}
-          path: build/receiver_rgb_${{ matrix.dmx_start }}_${{ github.event.inputs.led_count }}.hex
 
       - name: Rename RGBW output binary
         run: |
-          mv build/receiver_rgbw.ino.hex \
-             build/receiver_rgbw_${{ matrix.dmx_start }}_${{ github.event.inputs.led_count }}leds.hex
+          mv receiver_rgbw/build/receiver_rgbw.ino.hex \
+             receiver_rgbw/build/receiver_rgbw_${{ matrix.dmx_start }}_${{ github.event.inputs.led_count }}leds.hex
       - name: Upload RGBW build artifact for DMX start ${{ matrix.dmx_start }}
         uses: actions/upload-artifact@v4
         with:
           name: receiver_rgbw_${{ matrix.dmx_start }}_${{ github.event.inputs.led_count }}
-          path: build/receiver_rgbw_${{ matrix.dmx_start }}_${{ github.event.inputs.led_count }}.hex
+          path: receiver_rgbw/build/receiver_rgbw_${{ matrix.dmx_start }}_${{ github.event.inputs.led_count }}.hex
 
   release:
     runs-on: ubuntu-latest
