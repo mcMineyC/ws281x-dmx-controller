@@ -22,7 +22,7 @@ jobs:
       - name: Set up Arduino CLI
         run: |
           arduino-cli lib install DMXSerial
-          arduino-cli core install arduino:avr:uno
+          arduino-cli core install arduino:avr
 
       # Build RGB version
       - name: Prepare RGB sketch
