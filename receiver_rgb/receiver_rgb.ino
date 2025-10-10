@@ -24,8 +24,9 @@
 #include <DMXSerial.h>
 #include "ws2812.h"                // a specific LED controller that disables interrupts to work better
 
-#define NUM_LEDS 48                // number of RGB LEDs on strip
-#define DMXSTART 24*3 + 1                 // first DMX channel
+// Macros defined by script
+#define NUM_LEDS <#NUMPIXELS#>                // number of RGB LEDs on strip
+#define DMXSTART <#DMXADDRESS#>                 // first DMX channel
 #define DMXLENGTH (NUM_LEDS*3)+(DMXSTART-1)     // number of DMX channels used (3*48 LEDs)
 
 byte blankRgbData[DMXLENGTH];
