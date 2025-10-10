@@ -1,97 +1,244 @@
 <!doctype html>
 <html>
-  <head>
-    <title>avrgirl test</title>
-    <link href="https://fonts.googleapis.com/css?family=Baloo+Bhaina|Cabin+Sketch|Fugaz+One|Itim|Sacramento&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-  <div class="main">
-      <div class="wrapper">
-        <div class="bot">
-          <h1>Upload-o-matic</h1>
-          <p>Choose a program to upload to an arduino</p>
+    <head>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            html {
+                font-family: "Poppins";
+                --md-ref-typeface-brand: "Poppins";
+                --md-ref-typeface-plain: "Poppins";
+                background-color: var(--md-sys-color-surface);
+                color: var(--md-sys-color-on-surface);
+                --md-sys-color-surface-container: color-mix(
+                    in srgb,
+                    var(--md-sys-color-surface) 98%,
+                    var(--md-sys-color-on-surface) 2%
+                );
+                --md-linear-progress-track-height: 8px;
+                --md-linear-progress-track-shape: 8px;
+                --md-linear-progress-active-indicator-height: 8px;
+                --md-sys-color-surface-container-highest: #dde4e3;
+            }
+            body {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            .content {
+                display: flex;
+                flex-direction: column;
+                align-items: left;
+                max-width: 400px;
+                background-color: var(--md-sys-color-surface-container);
+                padding: 1rem;
+                border-radius: 1rem;
+            }
+            .content > * {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                padding: 4px;
+            }
+            .control-group {
+                width: 100%;
+                display: flex;
+                justify-content: space-between; /* Label at start, controls at end */
+                align-items: center;
+            }
+            .control-group > *:not(:first-child) {
+                width: 256px;
+                margin-right: 8px !important;
+            }
+            #flash-button {
+                margin-top: 1rem;
+                margin-top: 1rem;
+                margin-left: 2rem;
+                margin-right: 2rem;
+                width: 312px;
+            }
+            .settings-header {
+                width: fit-content;
+                font-weight: 500 !important;
+                margin-bottom: 1rem;
+            }
+            #progress-container {
+                width: 100%;
+                display: flex;
+                flex-direction: row;
+            }
+            #error-container {
+                width: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                color: #b00020;
+                font-weight: 500;
+                display: none;
+            }
+            #progress-container > * {
+                margin: 1rem;
+                margin-bottom: 0.5rem;
+                width: 100%;
+            }
+        </style>
+        <script type="importmap">
+            {
+                "imports": {
+                    "@material/web/": "https://esm.run/@material/web/"
+                }
+            }
+        </script>
+        <script>
+            // Patch uploader.js to show/hide error text
+            window.showAvrgirlError = function (msg) {
+                var errorDiv = document.getElementById("error-container");
+                errorDiv.textContent = msg;
+                errorDiv.style.display = "flex";
+            };
+            window.hideAvrgirlError = function () {
+                var errorDiv = document.getElementById("error-container");
+                errorDiv.textContent = "";
+                errorDiv.style.display = "none";
+            };
+        </script>
+        <script type="module">
+            import "@material/web/all.js";
+            import { styles as typescaleStyles } from "@material/web/typography/md-typescale-styles.js";
+            document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
+        </script>
+    </head>
+    <body>
+        <h1
+            style="font-weight: 900 !important"
+            class="md-typescale-display-medium"
+        >
+            WS281x DMX Controller Flasher
+        </h1>
+        <div class="content">
+            <div
+                style="
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                "
+            >
+                <span class="md-typescale-display-small settings-header"
+                    >Settings</span
+                >
+            </div>
+            <span class="control-group">
+                <span class="md-typescale-body-large">DMX Address</span>
+                <md-outlined-text-field
+                    aria-role="control"
+                    id="dmxstart"
+                    value="1"
+                >
+                </md-outlined-text-field>
+            </span>
 
-          <form id="uploadForm"> 
-            <label>Board:
-              <select id="boardType">
-                <option value="uno">Uno</option>
-                <option value="mega">Mega</option>
-              </select>
-            </label>
+            <span class="control-group">
+                <span class="md-typescale-body-large">Led Count</span>
+                <md-outlined-text-field
+                    aria-role="control"
+                    id="numled"
+                    value="128"
+                >
+                </md-outlined-text-field>
+            </span>
 
-            <label>Program:
-              <div class="fileButtonWrapper">
-                <button id="fileButton" type="button" aria-controls="fileInput">Choose file</button>
-                <input id="fileInput" tabindex="-1" type="file"/>
-                <span id="fileName">no file chosen</span>
-              </div>
-            </label>
-
-            <button type="button" id="uploadBtn">Upload!</button>
-          </form>
+            <span class="control-group">
+                <span class="md-typescale-body-large">Pixel Type</span>
+                <md-outlined-select
+                    required
+                    aria-role="control"
+                    id="pixel-type-select"
+                >
+                    <md-select-option value="rgb">
+                        <div slot="headline">RGB</div>
+                    </md-select-option>
+                    <md-select-option selected value="rgbw">
+                        <div slot="headline">RGBW</div>
+                    </md-select-option>
+                </md-outlined-select>
+            </span>
+            <md-filled-button id="flash-button" onclick="flashClicked"
+                >Flash</md-filled-button
+            >
+            <!-- style="visibility: hidden" -->
+            <div id="progress-container" style="display: none">
+                Flashing...
+                <md-linear-progress indeterminate></md-linear-progress>
+            </div>
+            <div id="error-container"></div>
         </div>
-        <div class="board">
-          <img src="images/ArduinoUno.svg"/>
-        </div>
-        <div id="pipe"></div>
-        <div id="progress"></div>
-        <div id="gear"><img src="images/gear4.svg"/></div>
-      </div>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="/avrgirl-arduino.global.js" charset="UTF-8"></script>
-    <script>
-      async function fetchBinary() {
-        const response = await axios.get("https://proxy.corsfix.com/?https://github.com/wled/WLED/releases/download/v0.15.1/WLED_0.15.1_ESP32.bin", {
-          responseType: 'arraybuffer' // Request the response as an ArrayBuffer
-        });
-        return response.data;
-      }
-      async function handleSubmit(e) {
-        e.preventDefault();
+        <!--<form>
+            <p class="md-typescale-body-large">
+                Check out these controls in a form!
+            </p>
+            <md-checkbox></md-checkbox>
+            <div>
+                <md-radio name="group"></md-radio>
+                <md-radio name="group"></md-radio>
+                <md-radio name="group"></md-radio>
+            </div>
+            <md-outlined-text-field
+                label="Favorite color"
+                value="Purple"
+            ></md-outlined-text-field>
+            <md-outlined-button type="reset">Reset</md-outlined-button>
+        </form>-->
+        <style>
+            :root {
+                --md-menu-container-color: var(
+                    --md-sys-color-surface-variant
+                ) !important;
+            }
+            form {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+        </style>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <script src="/avrgirl-arduino.global.js" charset="UTF-8"></script>
+        <script src="uploader.js"></script>
+        <script type="module">
+            import {
+                argbFromHex,
+                themeFromSourceColor,
+                applyTheme,
+            } from "https://cdn.jsdelivr.net/npm/@material/material-color-utilities@0.3.0/+esm";
+            function applyThemeColor(themeColor = "#17496C") {
+                // Get the theme from a hex color
+                console.log(themeColor);
+                const theme = themeFromSourceColor(argbFromHex(themeColor), [
+                    {
+                        name: "custom-1",
+                        value: argbFromHex(themeColor),
+                        blend: true,
+                        scheme: true,
+                        dynamiccolor: true,
+                    },
+                ]);
 
-				let filecontents;
-        const file = fileInput.files[0];
-        const board = boardType.value;
+                console.log(theme);
+                // Check if the user has dark mode turned on via system or switch
+                const systemDark = window.matchMedia(
+                    "(prefers-color-scheme: dark)",
+                ).matches;
 
-          filecontents = await fetchBinary();
-
-					let avrgirl = new AvrgirlArduino({
-						board: board,
-						debug: true
-					});
-          
-          gear.classList.add('spinning');
-
-          avrgirl.flash(filecontents, (error) =>  {
-            gear.classList.remove('spinning');
-            progress.textContent = "done!";
-						if (error) {
-							console.error(error);
-						} else {
-							console.info('done correctly.');
-						}
-					});
-
-       };
-
-      const uploadForm = document.getElementById('uploadForm');
-      const fileInput = document.getElementById('fileInput');
-      const fileButton = document.getElementById('fileButton');
-      const fileName = document.getElementById('fileName');
-      const boardType = document.getElementById('boardType');
-      const uploadBtn = document.getElementById('uploadBtn');
-      const log = document.getElementById('log');
-      const progress = document.getElementById('progress');
-      const gear = document.getElementById('gear');
-
-      uploadBtn.addEventListener('click', handleSubmit);
-      fileButton.addEventListener('click', () => fileInput.click());
-      fileInput.addEventListener('change', (event) => {
-        const file = event.target.files[0];
-        if (file) fileName.textContent = file.name;
-      });
-    </script>
-  </body>
+                // Apply the theme to the body by updating custom properties for material tokens
+                applyTheme(theme, {
+                    target: document.getElementsByTagName("html")[0],
+                    dark: systemDark,
+                });
+            }
+            applyThemeColor();
+            window.apc = applyThemeColor;
+        </script>
+    </body>
 </html>
