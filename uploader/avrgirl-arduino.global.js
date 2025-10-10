@@ -185,7 +185,7 @@ var boards = [
     signature: Buffer.from([0x1e, 0x95, 0x0f]),
     pageSize: 128,
     numPages: 256,
-    timeout: 400,
+    timeout: 1000,
     productId: ['0x0043', '0x7523', '0x0001', '0xea60', '0x6015'],
     productPage: 'https://store.arduino.cc/arduino-uno-rev3',
     protocol: 'stk500v1'
