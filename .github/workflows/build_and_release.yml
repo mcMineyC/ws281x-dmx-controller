@@ -101,7 +101,7 @@ jobs:
         with:
           tag_name: ${{ github.event.inputs.led_count }}
           name: "${{ github.event.inputs.led_count }} LEDs"
-          body: "#Arduino Uno only!!!\nDownload the file you need and flash with any AVR programmer.\nName format: receiver_rgb(w)_(dmx start address)_(num leds)leds.hex"
+          body: "# Arduino Uno only!!!\nDownload the file you need and flash with any AVR programmer.\nName format: receiver_rgb(w)_(dmx start address)_(num leds)leds.hex"
           files: |
             rgb_builds/receiver_rgb_*_${{ github.event.inputs.led_count }}leds.hex
             rgbw_builds/receiver_rgbw_*_${{ github.event.inputs.led_count }}leds.hex
