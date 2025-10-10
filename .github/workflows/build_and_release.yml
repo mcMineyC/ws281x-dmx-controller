@@ -97,7 +97,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: rgbw_builds
-
+      - run: ls *
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
