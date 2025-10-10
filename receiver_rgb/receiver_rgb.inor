@@ -44,7 +44,7 @@ void setup () {
     }else{
       blankRgbData[i*3] = 0;
       blankRgbData[i*3+1] = 0;
-      blankRgbDatai*3+2 = 255;
+      blankRgbData[i*3+2] = 255;
     }
   }
 

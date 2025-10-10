@@ -18,16 +18,33 @@ jobs:
       - uses: actions/checkout@v4
 
       # Build RGB version
-      - name: Prepare RGB sketch for DMX start ${{ matrix.dmx_start }}
+      - name: Prepare RGB sketch
         run: |
           cp receiver_rgb/receiver_rgb.inor receiver_rgb/receiver_rgb.ino
           sed -i "s/<#NUMPIXELS#>/${{ github.event.inputs.led_count }}/g" receiver_rgb/receiver_rgb.ino
           sed -i "s/<#DMXADDRESS#>/${{ matrix.dmx_start }}/g" receiver_rgb/receiver_rgb.ino
 
-      - name: Compile RGB sketch for DMX start ${{ matrix.dmx_start }}
+      # - name: Compile RGB sketch
+      #   uses: arduino/compile-sketches@v1.1.2
+      #   with:
+      #     sketch-paths: |
+      #       - receiver_rgb
+      #     fqbn: arduino:avr:uno
+      #     libraries: |
+      #       DMXSerial
+
+      # Build RGBW version
+      - name: Prepare RGBW sketch
+        run: |
+          cp receiver_rgbw/receiver_rgbw.inor receiver_rgbw/receiver_rgbw.ino
+          sed -i "s/<#NUMPIXELS#>/${{ github.event.inputs.led_count }}/g" receiver_rgbw/receiver_rgbw.ino
+          sed -i "s/<#DMXADDRESS#>/${{ matrix.dmx_start }}/g" receiver_rgbw/receiver_rgbw.ino
+
+      - name: Compile sketches
         uses: arduino/compile-sketches@v1.1.2
         with:
           sketch-paths: |
+            - receiver_rgbw
             - receiver_rgb
           fqbn: arduino:avr:uno
           libraries: |
@@ -37,27 +54,11 @@ jobs:
         run: |
           mv receiver_rgb/build/receiver_rgb.ino.hex \
              receiver_rgb/build/receiver_rgb_${{ matrix.dmx_start }}_${{ github.event.inputs.led_count }}leds.hex
-      - name: Upload RGB build artifact for DMX start ${{ matrix.dmx_start }}
+      - name: Upload RGB build artifact
         uses: actions/upload-artifact@v4
         with:
           name: receiver_rgb_${{ matrix.dmx_start }}_${{ github.event.inputs.led_count }}
           path: receiver_rgb/build/receiver_rgb_${{ matrix.dmx_start }}_${{ github.event.inputs.led_count }}.hex
-
-      # Build RGBW version
-      - name: Prepare RGBW sketch for DMX start ${{ matrix.dmx_start }}
-        run: |
-          cp receiver_rgbw/receiver_rgbw.inor receiver_rgbw/receiver_rgbw.ino
-          sed -i "s/<#NUMPIXELS#>/${{ github.event.inputs.led_count }}/g" receiver_rgbw/receiver_rgbw.ino
-          sed -i "s/<#DMXADDRESS#>/${{ matrix.dmx_start }}/g" receiver_rgbw/receiver_rgbw.ino
-
-      - name: Compile RGBW sketch for DMX start ${{ matrix.dmx_start }}
-        uses: arduino/compile-sketches@v1.1.2
-        with:
-          sketch-paths: |
-            - receiver_rgbw
-          fqbn: arduino:avr:uno
-          libraries: |
-            DMXSerial
 
       - name: Rename RGBW output binary
         run: |
