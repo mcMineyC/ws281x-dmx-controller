@@ -13,6 +13,7 @@ function createWindow() {
       contextIsolation: false, // For compatibility with older code
     },
     show: false, // Don't show until ready
+    autoHideMenuBar: true, // Hide the menu bar
   });
 
   win.once("ready-to-show", () => {
@@ -24,6 +25,16 @@ function createWindow() {
 
   // Optionally open DevTools
   // win.webContents.openDevTools();
+
+  // Allow reload shortcut even with menu bar hidden
+  win.webContents.on("before-input-event", (event, input) => {
+    const isReload =
+      (input.control || input.meta) && input.key.toLowerCase() === "r";
+    if (isReload) {
+      win.reload();
+      event.preventDefault();
+    }
+  });
 
   return win;
 }

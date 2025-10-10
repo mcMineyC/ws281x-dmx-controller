@@ -33,10 +33,10 @@ async function flashClicked() {
   const numled = document.querySelector("#numled").value;
   const pixelType = document.querySelector("#pixel-type-select").value;
   var binary = await fetchBinary(address, pixelType, numled);
-  document.querySelector("#flash-button").style.display = "flex";
-  document.querySelector("#progress-container").style.display = "none";
   try {
     avrgirl.flash(binary, (error) => {
+      document.querySelector("#flash-button").style.display = "flex";
+      document.querySelector("#progress-container").style.display = "none";
       if (error) {
         window.showAvrgirlError(error.toString().substring(0, 42));
         // setTimeout(() => window.hideAvrgirlError(), 1000);

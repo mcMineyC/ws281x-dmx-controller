@@ -12,7 +12,7 @@
     "electron": "^28.2.3"
   },
   "dependencies": {
-    "avrgirl-arduino": "file:../avrgirl-arduino",
+    "avrgirl-arduino": "git+https://github.com/mcmineyc/avrgirl-arduino",
     "axios": "^1.12.2",
     "nan": "^2.23.0",
     "serialport": "^10.3.0"
