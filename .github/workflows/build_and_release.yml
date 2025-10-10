@@ -9,7 +9,7 @@ on:
         type: string
 
 jobs:
-  build:
+  build_1_256:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -271,6 +271,65 @@ jobs:
             254,
             255,
             256,
+          ]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Arduino CLI
+        uses: arduino/setup-arduino-cli@v2
+      - name: Set up Arduino CLI
+        run: |
+          arduino-cli lib install DMXSerial
+          arduino-cli core install arduino:avr
+
+      # Build RGB version
+      - name: Prepare RGB sketch
+        run: |
+          cp receiver_rgb/receiver_rgb.inor receiver_rgb/receiver_rgb.ino
+          sed -i "s/<#NUMPIXELS#>/${{ github.event.inputs.led_count }}/g" receiver_rgb/receiver_rgb.ino
+          sed -i "s/<#DMXADDRESS#>/${{ matrix.dmx_start }}/g" receiver_rgb/receiver_rgb.ino
+
+      - name: Compile receiver_rgb
+        run: |
+          arduino-cli compile --fqbn arduino:avr:uno receiver_rgb --output-dir receiver_rgb/build
+      - run: ls */*
+      - name: Rename RGB output binary
+        run: |
+          mv receiver_rgb/build/receiver_rgb.ino.hex \
+             receiver_rgb/build/receiver_rgb_${{ matrix.dmx_start }}_${{ github.event.inputs.led_count }}leds.hex
+      - name: Upload RGB build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: receiver_rgb_${{ matrix.dmx_start }}_${{ github.event.inputs.led_count }}leds.hex
+          path: receiver_rgb/build/receiver_rgb_${{ matrix.dmx_start }}_${{ github.event.inputs.led_count }}leds.hex
+
+      # Build RGBW version
+      - name: Prepare RGBW sketch
+        run: |
+          cp receiver_rgbw/receiver_rgbw.inor receiver_rgbw/receiver_rgbw.ino
+          sed -i "s/<#NUMPIXELS#>/${{ github.event.inputs.led_count }}/g" receiver_rgbw/receiver_rgbw.ino
+          sed -i "s/<#DMXADDRESS#>/${{ matrix.dmx_start }}/g" receiver_rgbw/receiver_rgbw.ino
+
+      - name: Compile receiver_rgbw
+        run: |
+          arduino-cli compile --fqbn arduino:avr:uno receiver_rgbw --output-dir receiver_rgbw/build
+
+      - name: Rename RGBW output binary
+        run: |
+          mv receiver_rgbw/build/receiver_rgbw.ino.hex \
+             receiver_rgbw/build/receiver_rgbw_${{ matrix.dmx_start }}_${{ github.event.inputs.led_count }}leds.hex
+      - name: Upload RGBW build artifact for DMX start ${{ matrix.dmx_start }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: receiver_rgbw_${{ matrix.dmx_start }}_${{ github.event.inputs.led_count }}leds.hex
+          path: receiver_rgbw/build/receiver_rgbw_${{ matrix.dmx_start }}_${{ github.event.inputs.led_count }}leds.hex
+
+  build_257_512:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dmx_start:
+          [
             257,
             258,
             259,
@@ -545,14 +604,6 @@ jobs:
           sed -i "s/<#NUMPIXELS#>/${{ github.event.inputs.led_count }}/g" receiver_rgb/receiver_rgb.ino
           sed -i "s/<#DMXADDRESS#>/${{ matrix.dmx_start }}/g" receiver_rgb/receiver_rgb.ino
 
-      # - name: Compile RGB sketch
-      #   uses: arduino/compile-sketches@v1.1.2
-      #   with:
-      #     sketch-paths: |
-      #       - receiver_rgb
-      #     fqbn: arduino:avr:uno
-      #     libraries: |
-      #       DMXSerial
       - name: Compile receiver_rgb
         run: |
           arduino-cli compile --fqbn arduino:avr:uno receiver_rgb --output-dir receiver_rgb/build
@@ -574,14 +625,6 @@ jobs:
           sed -i "s/<#NUMPIXELS#>/${{ github.event.inputs.led_count }}/g" receiver_rgbw/receiver_rgbw.ino
           sed -i "s/<#DMXADDRESS#>/${{ matrix.dmx_start }}/g" receiver_rgbw/receiver_rgbw.ino
 
-      # - name: Compile RGBW sketch
-      #   uses: arduino/compile-sketches@v1.1.2
-      #   with:
-      #     sketch-paths: |
-      #       - receiver_rgbw
-      #     fqbn: arduino:avr:uno
-      #     libraries: |
-      #       DMXSerial
       - name: Compile receiver_rgbw
         run: |
           arduino-cli compile --fqbn arduino:avr:uno receiver_rgbw --output-dir receiver_rgbw/build
@@ -598,7 +641,7 @@ jobs:
 
   release:
     runs-on: ubuntu-latest
-    needs: build
+    needs: [build_1_256, build_257_512]
     permissions:
       contents: write
     steps:
