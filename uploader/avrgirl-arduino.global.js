@@ -188,7 +188,7 @@ var boards = [
     timeout: 1000,
     productId: ['0x0043', '0x7523', '0x0001', '0xea60', '0x6015'],
     productPage: 'https://store.arduino.cc/arduino-uno-rev3',
-    protocol: 'stk500v1'
+    protocol: 'avr109'
   },
   {
     name: 'micro',
