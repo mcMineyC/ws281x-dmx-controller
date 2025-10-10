@@ -1,0 +1,76 @@
+name: Build and Release Arduino Sketch
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Modify sketch.ino with configuration values
+        run: |
+          # Replace <#DMXADDRESS#> with 15
+          sed -i 's/<#DMXADDRESS#>/15/g' sketch.ino
+
+          # Replace <#PIXEL_TYPE#> with rgbw
+          sed -i 's/<#PIXEL_TYPE#>/rgbw/g' sketch.ino
+
+          echo "Modified sketch.ino:"
+          cat sketch.ino
+
+      - name: Setup Arduino CLI
+        uses: arduino/setup-arduino-cli@v1
+
+      - name: Initialize Arduino CLI config
+        run: |
+          arduino-cli config init
+          arduino-cli core update-index
+
+      - name: Install Arduino AVR core
+        run: |
+          arduino-cli core install arduino:avr
+
+      - name: Install required libraries
+        run: |
+          arduino-cli lib install "Adafruit NeoPixel"
+          arduino-cli lib install "DMXUSB" || echo "DMXUSB library not found in library manager, skipping"
+
+      - name: Compile Arduino sketch
+        run: |
+          # Create a directory for the sketch (Arduino requires sketch to be in a folder with matching name)
+          mkdir -p ws281x-dmx-controller
+          cp sketch.ino ws281x-dmx-controller/ws281x-dmx-controller.ino
+
+          # Compile for Arduino Uno
+          arduino-cli compile --fqbn arduino:avr:uno ws281x-dmx-controller
+
+          # Copy the compiled hex file
+          cp ws281x-dmx-controller/build/arduino.avr.uno/ws281x-dmx-controller.ino.hex ./ws281x-dmx-controller.hex
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./ws281x-dmx-controller.hex
+          asset_name: ws281x-dmx-controller.hex
+          asset_content_type: application/octet-stream
