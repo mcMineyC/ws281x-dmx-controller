@@ -27,7 +27,8 @@ jobs:
       - name: Compile RGB sketch for DMX start ${{ matrix.dmx_start }}
         uses: arduino/compile-sketches@v1.1.2
         with:
-          sketch-path: receiver_rgb
+          sketch-paths: |
+            - receiver_rgb
           fqbn: arduino:avr:uno
           libraries: |
             DMXSerial
@@ -54,7 +55,8 @@ jobs:
       - name: Compile RGBW sketch for DMX start ${{ matrix.dmx_start }}
         uses: arduino/compile-sketches@v1.1.2
         with:
-          sketch-path: receiver_rgbw
+          sketch-paths: |
+            - receiver_rgb
           fqbn: arduino:avr:uno
           libraries: |
             DMXSerial
