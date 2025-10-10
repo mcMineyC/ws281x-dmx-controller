@@ -8,6 +8,57 @@
         <style>
             html {
                 font-family: "Poppins";
+                --md-ref-typeface-brand: "Poppins";
+                --md-ref-typeface-plain: "Poppins";
+                background-color: var(--md-sys-color-surface);
+                color: var(--md-sys-color-on-surface);
+                --md-sys-color-surface-container: color-mix(
+                    in srgb,
+                    var(--md-sys-color-surface) 98%,
+                    var(--md-sys-color-on-surface) 2%
+                );
+            }
+            body {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            .content {
+                display: flex;
+                flex-direction: column;
+                align-items: left;
+                max-width: 400px;
+                background-color: var(--md-sys-color-surface-container);
+                padding: 1rem;
+                border-radius: 1rem;
+            }
+            .content > * {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                padding: 4px;
+            }
+            .control-group {
+                width: 100%;
+                display: flex;
+                justify-content: space-between; /* Label at start, controls at end */
+                align-items: center;
+            }
+            .control-group > *:not(:first-child) {
+                width: 256px;
+                margin-right: 8px !important;
+            }
+            #flash-button {
+                margin-top: 1rem;
+                margin-top: 1rem;
+                margin-left: 2rem;
+                margin-right: 2rem;
+                width: 312px;
+            }
+            .settings-header {
+                width: fit-content;
+                font-weight: 500 !important;
+                margin-bottom: 1rem;
             }
         </style>
         <script type="importmap">
@@ -20,14 +71,67 @@
         <script type="module">
             import "@material/web/all.js";
             import { styles as typescaleStyles } from "@material/web/typography/md-typescale-styles.js";
-
             document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
         </script>
     </head>
     <body>
-        <h1 class="md-typescale-display-medium">Hello Material!</h1>
-        <form>
-            <p class="md-typescale-body-medium">
+        <h1
+            style="font-weight: 900 !important"
+            class="md-typescale-display-medium"
+        >
+            WS281x DMX Controller Flasher
+        </h1>
+        <div class="content">
+            <div
+                style="
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                "
+            >
+                <span class="md-typescale-display-small settings-header"
+                    >Settings</span
+                >
+            </div>
+            <span class="control-group">
+                <span class="md-typescale-body-large">DMX Address</span>
+                <md-outlined-text-field
+                    aria-role="control"
+                    id="dmxstart"
+                    value="1"
+                >
+                </md-outlined-text-field>
+            </span>
+
+            <span class="control-group">
+                <span class="md-typescale-body-large">Led Count</span>
+                <md-outlined-text-field
+                    aria-role="control"
+                    id="numled"
+                    value="128"
+                >
+                </md-outlined-text-field>
+            </span>
+
+            <span class="control-group">
+                <span class="md-typescale-body-large">Pixel Type</span>
+                <md-outlined-select
+                    required
+                    aria-role="control"
+                    id="pixel-type-select"
+                >
+                    <md-select-option value="rgb">
+                        <div slot="headline">RGB</div>
+                    </md-select-option>
+                    <md-select-option selected value="rgbw">
+                        <div slot="headline">RGBW</div>
+                    </md-select-option>
+                </md-outlined-select>
+            </span>
+            <md-filled-button id="flash-button">Flash</md-filled-button>
+        </div>
+        <!--<form>
+            <p class="md-typescale-body-large">
                 Check out these controls in a form!
             </p>
             <md-checkbox></md-checkbox>
@@ -41,8 +145,13 @@
                 value="Purple"
             ></md-outlined-text-field>
             <md-outlined-button type="reset">Reset</md-outlined-button>
-        </form>
+        </form>-->
         <style>
+            :root {
+                --md-menu-container-color: var(
+                    --md-sys-color-surface-variant
+                ) !important;
+            }
             form {
                 display: flex;
                 flex-direction: column;
@@ -50,5 +159,39 @@
                 gap: 16px;
             }
         </style>
+        <script type="module">
+            import {
+                argbFromHex,
+                themeFromSourceColor,
+                applyTheme,
+            } from "https://cdn.jsdelivr.net/npm/@material/material-color-utilities@0.3.0/+esm";
+            function applyThemeColor(themeColor = "#17496C") {
+                // Get the theme from a hex color
+                console.log(themeColor);
+                const theme = themeFromSourceColor(argbFromHex(themeColor), [
+                    {
+                        name: "custom-1",
+                        value: argbFromHex(themeColor),
+                        blend: true,
+                        scheme: true,
+                        dynamiccolor: true,
+                    },
+                ]);
+
+                console.log(theme);
+                // Check if the user has dark mode turned on via system or switch
+                const systemDark = window.matchMedia(
+                    "(prefers-color-scheme: dark)",
+                ).matches;
+
+                // Apply the theme to the body by updating custom properties for material tokens
+                applyTheme(theme, {
+                    target: document.getElementsByTagName("html")[0],
+                    dark: systemDark,
+                });
+            }
+            applyThemeColor();
+            window.apc = applyThemeColor;
+        </script>
     </body>
 </html>
