@@ -1,0 +1,58 @@
+var lastFlash = {};
+let avrgirl = new AvrgirlArduino({
+  board: "uno",
+  debug: true,
+});
+async function fetchBinary(dmxstart, pixeltype, numled) {
+  if (
+    lastFlash.dmxstart == dmxstart &&
+    lastFlash.pixeltype == pixeltype &&
+    lastFlash.numled == numled
+  )
+    return lastFlash.buffer;
+
+  var url = `https://github.com/mcMineyC/ws281x-dmx-controller/releases/download/${numled}/receiver_${pixeltype}_${dmxstart}_${numled}leds.hex`;
+  const response = await axios.get("https://proxy.corsfix.com/?" + url, {
+    responseType: "arraybuffer", // Request the response as an ArrayBuffer
+  });
+  lastFlash = {
+    dmxstart,
+    pixeltype,
+    numled,
+    buffer: response.data,
+  };
+  return response.data;
+}
+async function flashClicked() {
+  console.log("Flash clicked");
+  document.querySelector("#flash-button").style.display = "none";
+  document.querySelector("#progress-container").style.display = "flex";
+  window.hideAvrgirlError();
+  const address = document.querySelector("#dmxstart").value;
+  const numled = document.querySelector("#numled").value;
+  const pixelType = document.querySelector("#pixel-type-select").value;
+  var binary = await fetchBinary(address, pixelType, numled);
+  document.querySelector("#flash-button").style.display = "flex";
+  document.querySelector("#progress-container").style.display = "none";
+  try {
+    avrgirl.flash(binary, (error) => {
+      if (error) {
+        window.showAvrgirlError(error.toString().substring(0, 42));
+        // setTimeout(() => window.hideAvrgirlError(), 1000);
+        console.log(error);
+      } else {
+        window.hideAvrgirlError();
+        console.info("done correctly.");
+      }
+    });
+  } catch (e) {
+    if (e.toString().includes("requestPort")) {
+      alert(
+        "Please use Chrome.\nThis tool needs WebUSB which for some reason\nis only available in Chrome-based browsers :/",
+      );
+    } else {
+      console.error(e);
+    }
+  }
+}
+document.querySelector("#flash-button").addEventListener("click", flashClicked);

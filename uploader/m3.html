@@ -17,6 +17,10 @@
                     var(--md-sys-color-surface) 98%,
                     var(--md-sys-color-on-surface) 2%
                 );
+                --md-linear-progress-track-height: 8px;
+                --md-linear-progress-track-shape: 8px;
+                --md-linear-progress-active-indicator-height: 8px;
+                --md-sys-color-surface-container-highest: #dde4e3;
             }
             body {
                 display: flex;
@@ -60,6 +64,25 @@
                 font-weight: 500 !important;
                 margin-bottom: 1rem;
             }
+            #progress-container {
+                width: 100%;
+                display: flex;
+                flex-direction: row;
+            }
+            #error-container {
+                width: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                color: #b00020;
+                font-weight: 500;
+                display: none;
+            }
+            #progress-container > * {
+                margin: 1rem;
+                margin-bottom: 0.5rem;
+                width: 100%;
+            }
         </style>
         <script type="importmap">
             {
@@ -67,6 +90,19 @@
                     "@material/web/": "https://esm.run/@material/web/"
                 }
             }
+        </script>
+        <script>
+            // Patch uploader.js to show/hide error text
+            window.showAvrgirlError = function (msg) {
+                var errorDiv = document.getElementById("error-container");
+                errorDiv.textContent = msg;
+                errorDiv.style.display = "flex";
+            };
+            window.hideAvrgirlError = function () {
+                var errorDiv = document.getElementById("error-container");
+                errorDiv.textContent = "";
+                errorDiv.style.display = "none";
+            };
         </script>
         <script type="module">
             import "@material/web/all.js";
@@ -128,7 +164,15 @@
                     </md-select-option>
                 </md-outlined-select>
             </span>
-            <md-filled-button id="flash-button">Flash</md-filled-button>
+            <md-filled-button id="flash-button" onclick="flashClicked"
+                >Flash</md-filled-button
+            >
+            <!-- style="visibility: hidden" -->
+            <div id="progress-container" style="display: none">
+                Flashing...
+                <md-linear-progress indeterminate></md-linear-progress>
+            </div>
+            <div id="error-container"></div>
         </div>
         <!--<form>
             <p class="md-typescale-body-large">
@@ -159,6 +203,9 @@
                 gap: 16px;
             }
         </style>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <script src="/avrgirl-arduino.global.js" charset="UTF-8"></script>
+        <script src="uploader.js"></script>
         <script type="module">
             import {
                 argbFromHex,
