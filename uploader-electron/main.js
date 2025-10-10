@@ -58,8 +58,8 @@ ipcMain.handle("download-firmware", async (event, opts) => {
   }
   try {
     const url = `https://github.com/mcMineyC/ws281x-dmx-controller/releases/download/${numled}/receiver_${pixeltype}_${dmxstart}_${numled}leds.hex`;
-    const response = await axios.get("https://proxy.corsfix.com/?" + url, {
-      responseType: "arraybuffer",
+    const response = await axios.get(url, {
+      responsetype: "arraybuffer",
     });
     lastFlash = {
       dmxstart,
