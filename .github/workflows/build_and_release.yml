@@ -100,4 +100,5 @@ jobs:
           name: "${{ github.event.inputs.led_count }} LEDs"
           body: "# Arduino Uno only!!!\nDownload the file you need and flash with any AVR programmer.\nName format: receiver_rgb(w)_(dmx start address)_(num leds)leds.hex"
           files: |
-            receiver_rgb*_*_${{ github.event.inputs.led_count }}leds.hex
+            */receiver_rgb*_*_${{ github.event.inputs.led_count }}leds.hex
+            */*/receiver_rgb*_*_${{ github.event.inputs.led_count }}leds.hex
