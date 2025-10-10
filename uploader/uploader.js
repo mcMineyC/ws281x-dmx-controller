@@ -92,3 +92,4 @@ async function flashClicked() {
   }
 }
 document.querySelector("#flash-button").addEventListener("click", flashClicked);
+document.querySelector("#test-button").addEventListener("click", testClicked);
