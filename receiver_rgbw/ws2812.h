@@ -125,8 +125,8 @@ inline void sendByte(uint8_t byte)
 
 void sendPixel(uint8_t r, uint8_t g, uint8_t b, uint8_t w)  {
   // For SK6812 RGBW, the order is usually GRBW
-  sendByte(g);
   sendByte(r);
+  sendByte(g);
   sendByte(b);
   sendByte(w);
 } // sendPixel
